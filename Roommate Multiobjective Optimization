@@ -1,0 +1,129 @@
+import csv
+import psycopg2
+import psycopg2.extensions
+psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
+psycopg2.extensions.register_type(psycopg2.extensions.UNICODEARRAY)
+conn_string = "dbname='FHroommateselection' user='postgres' password='things'" #NEED TO CHANGE THE PWD
+
+conn = psycopg2.connect(conn_string) #psy is the thing that bridges postgres to python
+cursor = conn.cursor() #lets you work with data inside of python
+
+#all of the "lists" are actually going to be dictionaries, with the uniqueID and table/column acting as keys that will
+#point to a value
+
+
+#Makes a list of the names then generates the weights off of each one
+def buildListOfNames():#should i loop through each table in the db, and nest each column within each table?
+    cur.execute("SELECT uniqueid FROM memberinfo") #get every members uniqueid
+    uniqueids = cur.fetchone()[0] #need to figure out the format for this
+
+    #this is so obscenely wrong but now it's a placeholder.
+    iter = 0
+    for member in uniqueids:
+        uniqueIDlist[iter] = member
+        iter+=1
+
+    for member in uniqueIDlist:
+        #I have a list called weights referencing the 3 columns..?
+        #generates the weight values relative to each other to provide meaning
+        cur.execute("SELECT wp, wi, wh WHERE uniqueid " + str(row[uniqueid]))
+        ratedweight_p = str(cur.execute("SELECT wp FROM personality_prefs WHERE uniqueid is " + str(member)))
+        ratedweight_i = str(cur.execute("SELECT wp FROM interest_prefs WHERE uniqueid is " + str(member)))
+        ratedweight_h = str(cur.execute("SELECT wp FROM habit_prefs WHERE uniqueid is " + str(memeber)))
+
+        weight_p = ratedweight_p/(ratedweight_p + ratedweight_i + ratedweight_h)
+        weight_i = ratedweight_i/(ratedweight_p + ratedweight_i + ratedweight_h)
+        weight_h = ratedweight_h/(ratedweight_p + ratedweight_i + ratedweight_h)
+
+        for each in [weight_p,weight_i,weight_h]:
+            each = each/len(listOfPrefs) #....this returns weight_p = those things... right?
+            cur.execute("INSERT INTO ") #append these things back to the db
+            con.commit()
+
+    return something
+
+
+
+#attempting again to write out the logic for generating binary indicators of match for each quality vs. preferences
+#this is probably the only thing that's almost correct.
+def matchMatrixFill(member, potential):
+    membervalue=0
+    potenvalue=0
+    for potential in ListMemberUniqueID:
+        #brings in value of the member's preference and the potential's quality to be compared here
+        for pref in ListColumnPrefTypes:
+            membervalue = cur.execute("SELECT "+str(pref)+"FROM qualprefs WHERE uniqueid LIKE "+str(member))
+            potenvalue = cur.execute("SELECT "+str(pref)+"FROM ownquals WHERE uniqueid LIKE " +str(potential))
+        if member == potential:
+            return machMatrixFill(member+1,potential)
+        if membervalue == potenvalue:
+            cur.execute("UPDATE matchmatrix SET "+str(potential)+"=1 WHERE name LIKE " +str(member))
+            con.commmit()
+        else:
+            cur.execute("UPDATE matchmatrix SET "+str(potential)+" =0 WHERE name LIKE " +str(member))
+            con.commit()
+    return matchMatrixFill(member+1,potential)
+
+
+
+
+
+
+
+#this will be called within a loop for every POTENTIAL member and compared against the new member
+def disqualifyMatch():
+    #yeah this value is going to need more work.
+    #basically just pulls the number of vacancies available in a potential roommate's room
+    vacancyindicator = cur.execture("SELECT vacancy FROM roominfo WHERE uniqueid LIKE" + str(potential))
+        #if there isn't a vacancy in the room, drop the person
+        if vacancyindicator == 0:
+            rowresident.remove(potential[roomList[room]])
+    #populates list of potential roommates, dumps data for self? FIX
+    for member in alltherows:
+        for potential in alltherows:
+            potentialList=[allthenames]
+            #get rid of
+            potentialList.remove(name)
+            #this first one does some general data cleaning for old residents
+            if name[moveoutdate] < 'currentdate':
+                name.remove() #from database entirely
+            if (name[cleanliness] == 'dirty'  or potential[cleanliness] == 'clean') or (name[cleanliness] == 'clean' and potential[cleanliness] == 'dirty'):
+                maybelist.append(potential) #and do the same thing for B to A
+                listoptions.remove(potential)
+            if(name[moveindate] - potential[moveoutdate] < "7 days" #this will definitely need fixing
+
+            #get rid of
+            if name[genderreq]!= listoptions[potential[gender]]:
+                listoptions.remove(potential)#also do the thing to remove A from B, not just A from B
+            if potential[roomloc[vacancy]] == 0:
+                listoptions.remove(potential)
+            if abs(name[weight[each]]-potential[weight[each]]) > .3:
+                maybelist.append(potential) #and do the same thing for B to A
+                listoptions.remove(potential)
+
+#This is going to take the sum of the products of the weights and personal ratings
+def percentMatchMatrix(member,potential):
+    #if not missing (because values were moved to another list)
+    if name[potential] == 0 or name[potential] == 1:
+    #each type of quality has a main basic weight that can be multiplied vover
+        for weight in weightsList:
+            #base case: if one person doesn't care at all, all values will come out as zero, so don't evaluate
+            if weight == 0:
+                return percentMatchMatrix(member+1,potential)
+           for p in qualPrefs(somethingsomething)): #rethink what you're looping through..
+                if name[p] == potential[p]:
+                    name(col(potential)) = 1 #no way in hell is this referencing the right thing
+                    potential(col(name)) = 1 #no way in hell is this referencing the right thing
+                else:
+                    name(col(potential)) = 0 #no way in hell is this referencing the right thing
+                    potential(col(name)) = 0 #no way in hell is this referencing the right thing
+    return sdgasgsad
+
+
+#still need to decided how to compare the qualityRequirements to the actuality
+
+#the query pulls the highest match
+#based off of the highest decimal values after the disqualifiers of different levels
+#of importance.
+
+#also need to account for name(all_columns) and allcolumns[name]
